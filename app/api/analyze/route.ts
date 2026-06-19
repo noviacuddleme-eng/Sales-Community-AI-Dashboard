@@ -6,10 +6,11 @@ const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const roleContext = `
 Struktur Sales Community:
 1. Supervisor Sales Community: arah, target, keputusan, coaching, marketplace Malaysia, dan eskalasi lintas fungsi.
-2. Sales Relation / Account Executive: komunikasi seller, PO/sell-out follow-up, laporan seller, program, NPD, dan seller issue.
-3. Sales Acquisition Malaysia: lead generation, prospecting, qualification, meeting, proposal, onboarding, dan first PO.
-4. Sales Delivery & Operations: validasi PO, stok, shortage, alokasi, produksi, fulfillment, delivery, dan outstanding.
-5. Sales Admin & Data Support: Odoo, master data, dashboard, laporan, dokumentasi, reminder, dan evidence.
+2. Key Account Leader: memimpin strategi, pengembangan, coaching, segmentasi, recovery plan, program, NPD, dan performa Seller Community; Sales Relation / Account Executive melapor ke posisi ini.
+3. Sales Relation / Account Executive: komunikasi seller, PO/sell-out follow-up, laporan seller, program, NPD, dan seller issue.
+4. Sales Acquisition Malaysia: lead generation, prospecting, qualification, meeting, proposal, onboarding, dan first PO.
+5. Sales Delivery & Operations: validasi PO, stok, shortage, alokasi, produksi, fulfillment, delivery, outstanding, serta menjadi PIC utama koordinasi dengan forwarder atau ekspedisi untuk pengiriman Malaysia. Tugasnya mencakup quotation, jadwal pickup, dokumen shipment, tracking, customs coordination, ETA, biaya logistik, dan escalation keterlambatan. Supervisor menjadi approver/escalation untuk keputusan biaya atau risiko besar.
+6. Sales Admin & Data Support: Odoo, master data, dashboard, laporan, dokumentasi, reminder, dan evidence.
 `;
 
 export async function POST(request: Request) {
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
 
     const response = await client.responses.create({
       model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
-      instructions: `Anda adalah AI Task & Responsibility Analyzer untuk tim Sales Community. Gunakan konteks peran berikut:\n${roleContext}\nTentukan satu PIC utama. Berikan hasil dalam JSON valid dengan field: pic, support, reason, steps, evidence, ai_help, escalation, confidence. Semua array berisi string. Gunakan Bahasa Indonesia dan jangan mengarang posisi di luar konteks kecuali sebagai pihak support lintas divisi.`,
+      instructions: `Anda adalah AI Task & Responsibility Analyzer untuk tim Sales Community. Gunakan konteks peran berikut:\n${roleContext}\nTentukan satu PIC utama. Berikan hasil dalam JSON valid dengan field: pic, support, reason, steps, evidence, ai_help, escalation, confidence. Semua array berisi string. Gunakan Bahasa Indonesia dan jangan mengarang posisi di luar konteks kecuali sebagai pihak support lintas divisi. Untuk pertanyaan terkait forwarder, ekspedisi, shipment, customs, trucking, container, dokumen pengiriman, ETA, atau delivery Malaysia, pilih Sales Delivery & Operations sebagai PIC utama, kecuali pertanyaannya murni keputusan strategis atau approval di luar limit sehingga Supervisor menjadi escalation/approver.`,
       input: question,
       text: {
         format: {
